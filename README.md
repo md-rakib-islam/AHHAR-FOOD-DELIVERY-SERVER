@@ -1,1 +1,1 @@
-"# coding-club-institute-server" 
+"# server"
