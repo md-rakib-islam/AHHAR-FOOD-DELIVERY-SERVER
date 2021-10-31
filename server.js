@@ -14,7 +14,8 @@ app.get("/", (req, res) => {
   res.send("server is running");
 });
 
-const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.dv4ff.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+const uri =
+  "mongodb+srv://foodDelivery:llPAPkZ4io86ow2l@cluster0.yeed0.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -23,15 +24,15 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
-    const database = client.db("coding_club_institute");
-    const courses_Collection = database.collection("courses");
+    const database = client.db("foodDelivery");
+    const serviceCollection = database.collection("services");
     const cart_Collection = database.collection("cart");
 
     // load courses get api
-    app.get("/courses", async (req, res) => {
+    app.get("/services", async (req, res) => {
       const size = parseInt(req.query.size);
       const page = req.query.page;
-      const cursor = courses_Collection.find({});
+      const cursor = serviceCollection.find({});
       const count = await cursor.count();
       let courses;
 
@@ -47,10 +48,10 @@ async function run() {
     });
 
     // load single course get api
-    app.get("/courses/:id", async (req, res) => {
+    app.get("/services/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
-      const course = await courses_Collection.findOne(query);
+      const course = await serviceCollection.findOne(query);
       res.json(course);
     });
 
@@ -63,7 +64,7 @@ async function run() {
     });
 
     // add data to cart collection with additional info
-    app.post("/course/add", async (req, res) => {
+    app.post("/services/add", async (req, res) => {
       const course = req.body;
       const result = await cart_Collection.insertOne(course);
       res.json(result);
