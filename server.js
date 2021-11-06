@@ -14,8 +14,7 @@ app.get("/", (req, res) => {
   res.send("server is running");
 });
 
-const uri =
-  "mongodb+srv://foodDelivery:llPAPkZ4io86ow2l@cluster0.yeed0.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.yeed0.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -25,14 +24,14 @@ async function run() {
   try {
     await client.connect();
     const database = client.db("foodDelivery");
-    const serviceCollection = database.collection("services");
+    const services_Collection = database.collection("services");
     const cart_Collection = database.collection("cart");
 
     // load courses get api
     app.get("/services", async (req, res) => {
       const size = parseInt(req.query.size);
       const page = req.query.page;
-      const cursor = serviceCollection.find({});
+      const cursor = services_Collection.find({});
       const count = await cursor.count();
       let courses;
 
@@ -51,7 +50,7 @@ async function run() {
     app.get("/services/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: ObjectId(id) };
-      const course = await serviceCollection.findOne(query);
+      const course = await services_Collection.findOne(query);
       res.json(course);
     });
 
@@ -64,7 +63,7 @@ async function run() {
     });
 
     // add data to cart collection with additional info
-    app.post("/services/add", async (req, res) => {
+    app.post("/course/add", async (req, res) => {
       const course = req.body;
       const result = await cart_Collection.insertOne(course);
       res.json(result);
@@ -89,6 +88,7 @@ async function run() {
     // orders get api
     app.get("/orders", async (req, res) => {
       const result = await cart_Collection.find({}).toArray();
+      console.log(result);
       res.json(result);
     });
   } finally {
